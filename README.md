@@ -176,7 +176,6 @@ Computer Science and Engineering – Cyber Security
 GitHub: https://github.com/codewithsinchana
 
 ---
-
 *Developed as a cybersecurity project to demonstrate network monitoring, intrusion detection concepts, and security event visualization.*
 
 # NIDS Dashboard (Flask, software-only)
