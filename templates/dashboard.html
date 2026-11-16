@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIDS | Security Operations Center</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+    --bg: #080d19;
+    --sidebar: #0d1424;
+    --surface: #111c30;
+    --surface2: #17243a;
+    --border: rgba(148,163,184,.13);
+    --text: #edf2ff;
+    --muted: #8d9bb5;
+    --cyan: #36d6c5;
+    --purple: #9b8cff;
+    --blue: #65a5ff;
+    --red: #ff647c;
+    --orange: #ffb45c;
+    --green: #4ade9a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 75% 0%, rgba(77,91,190,.13), transparent 38%),
+        radial-gradient(ellipse at 0% 80%, rgba(25,191,175,.07), transparent 35%),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+}
+
+button, a, select {
+    font: inherit;
+}
+
+/* SIDEBAR */
+
+aside {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 245px;
+    background: rgba(13,20,36,.96);
+    border-right: 1px solid var(--border);
+    padding: 25px 17px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 9px 28px;
+}
+
+.brand-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg,#20bfae,#6577ff);
+    box-shadow: 0 5px 25px rgba(54,214,197,.2);
+    font-size: 22px;
+}
+
+.brand-name {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+.brand-sub {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 4px;
+    letter-spacing: 1.5px;
+}
+
+.nav-label {
+    padding: 12px 12px 8px;
+    color: #66758e;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+aside a {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 13px;
+    margin: 3px 0;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: .2s;
+    border: 1px solid transparent;
+}
+
+aside a:hover {
+    background: rgba(255,255,255,.045);
+    color: white;
+}
+
+aside a.on {
+    color: #8ff5e9;
+    background: linear-gradient(90deg,rgba(54,214,197,.15),rgba(155,140,255,.08));
+    border-color: rgba(54,214,197,.17);
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sp {
+    flex: 1;
+}
+
+.sidebar-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+.sidebar-bottom .logout {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.profile-meta {
+    min-width: 0;
+}
+
+.profile-email {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+    overflow-wrap: anywhere;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 8px;
+    margin-bottom: 8px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#6c63d9,#2bb8aa);
+    font-weight: 800;
+}
+
+.profile-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.profile-role {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: #ff8797 !important;
+    background: rgba(255,100,124,.07);
+    border: 1px solid rgba(255,100,124,.18);
+    border-radius: 10px;
+    padding: 12px 13px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 650;
+}
+
+.logout:hover {
+    background: rgba(255,100,124,.15);
+}
+
+.profile-large {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-avatar-large {
+    width: 72px;
+    height: 72px;
+    font-size: 26px;
+    flex: 0 0 72px;
+}
+
+@media(max-width:650px) {
+    .header-logout-form {
+        display: inline-flex;
+    }
+}
+
+/* MAIN CONTENT */
+
+main {
+    margin-left: 245px;
+    padding: 30px 34px;
+    min-width: 0;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.header-title h1 {
+    font-size: 25px;
+    margin: 0;
+    letter-spacing: -.5px;
+}
+
+.header-title p {
+    color: var(--muted);
+    margin: 7px 0 0;
+    font-size: 12px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    background: rgba(74,222,154,.08);
+    border: 1px solid rgba(74,222,154,.2);
+    color: var(--green);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status-dot {
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg,#35bfae,#5876e8);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 9px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 650;
+    font-size: 12px;
+    transition: .2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+    box-shadow: 0 5px 18px rgba(54,214,197,.12);
+}
+
+.btn.alt {
+    background: var(--surface2);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.btn.danger {
+    background: rgba(255,100,124,.12);
+    color: #ff8797;
+    border-color: rgba(255,100,124,.2);
+}
+
+.header-logout-form {
+    margin: 0;
+}
+
+.btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* PAGES */
+
+.pg {
+    display: none;
+}
+
+.pg.on {
+    display: block;
+    animation: appear .25s ease;
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* CARDS */
+
+.grid {
+    display: grid;
+    gap: 16px;
+}
+
+.kpis {
+    grid-template-columns: repeat(5,minmax(0,1fr));
+    margin-bottom: 19px;
+}
+
+.card {
+    background: linear-gradient(145deg,rgba(20,32,54,.96),rgba(14,24,42,.96));
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 19px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.1);
+    transition: .2s;
+    min-width: 0;
+}
+
+.card:hover {
+    border-color: rgba(54,214,197,.25);
+    transform: translateY(-2px);
+}
+
+.kpi {
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi::after {
+    content: "";
+    position: absolute;
+    right: -22px;
+    top: -25px;
+    height: 95px;
+    width: 95px;
+    border-radius: 50%;
+    background: var(--glow);
+    opacity: .11;
+    filter: blur(3px);
+}
+
+.kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.k {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .4px;
+}
+
+.kpi-icon {
+    height: 34px;
+    width: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--iconbg);
+    font-size: 16px;
+}
+
+.v {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 13px;
+    letter-spacing: -.7px;
+}
+
+.kpi-caption {
+    margin-top: 5px;
+    color: #71809b;
+    font-size: 10px;
+}
+
+.two {
+    grid-template-columns: minmax(0,2fr) minmax(260px,1fr);
+}
+
+.card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 18px;
+    letter-spacing: .2px;
+}
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 210px;
+}
+
+.chart-wrap.small {
+    min-height: 190px;
+}
+
+.full-card {
+    margin-top: 17px;
+}
+
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.section-head h3 {
+    margin: 0;
+}
+
+/* TABLES */
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+th, td {
+    text-align: left;
+    padding: 13px 11px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+}
+
+th {
+    color: #8391ab;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    font-size: 10px;
+}
+
+td {
+    color: #d6def0;
+}
+
+tbody tr:hover {
+    background: rgba(255,255,255,.025);
+}
+
+.b {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.Critical {
+    color: #ff8797;
+    background: rgba(255,72,97,.14);
+}
+
+.High {
+    color: #ffbd72;
+    background: rgba(255,166,72,.13);
+}
+
+.Medium {
+    color: #f5dc72;
+    background: rgba(245,220,114,.12);
+}
+
+.Low {
+    color: #6ee7a8;
+    background: rgba(74,222,154,.12);
+}
+
+.empty {
+    text-align: center;
+    padding: 25px;
+    color: var(--muted);
+}
+
+/* RULES AND SETTINGS */
+
+.rule {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.rule:last-child {
+    border-bottom: 0;
+}
+
+.rule-name {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.rule-status {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+.description {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+select {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 9px 12px;
+    border-radius: 8px;
+    outline: none;
+}
+
+select:focus {
+    border-color: var(--cyan);
+}
+
+/* TOASTS */
+
+#toasts {
+    position: fixed;
+    right: 22px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 50;
+}
+
+.toast {
+    background: #19263a;
+    border: 1px solid rgba(255,100,124,.45);
+    border-left: 4px solid var(--red);
+    color: #ffe2e7;
+    padding: 14px 17px;
+    border-radius: 10px;
+    max-width: 340px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.35);
+    animation: appear .2s ease;
+}
+
+.toast.info {
+    border-color: rgba(54,214,197,.4);
+    border-left-color: var(--cyan);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1200px) {
+    .kpis {
+        grid-template-columns: repeat(3,minmax(0,1fr));
+    }
+}
+
+@media(max-width:900px) {
+    aside {
+        width: 205px;
+    }
+
+    main {
+        margin-left: 205px;
+        padding: 24px 20px;
+    }
+
+    .two {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:650px) {
+    aside {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 12px;
+    }
+
+    .brand {
+        padding-bottom: 12px;
+    }
+
+    .nav-label {
+        display: none;
+    }
+
+    aside {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    aside a {
+        padding: 9px;
+        font-size: 11px;
+    }
+
+    .sp {
+        display: none;
+    }
+
+    .sidebar-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        width: 100%;
+        border-top: 1px solid var(--border);
+        padding-top: 8px;
+    }
+
+    .profile {
+        margin: 0;
+        padding: 6px 4px;
+    }
+
+    .sidebar-bottom .logout {
+        margin-left: auto;
+    }
+
+    main {
+        margin-left: 0;
+        padding: 20px 13px;
+    }
+
+    .kpis {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    header {
+        align-items: flex-start;
+    }
+
+    .header-title h1 {
+        font-size: 20px;
+    }
+
+    .v {
+        font-size: 23px;
+    }
+}
+</style>
+    .v {
+        font-size: 23px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<aside>
+
+    <div class="brand">
+        <div class="brand-icon">🛡</div>
+        <div>
+            <div class="brand-name">NIDS<span style="color:var(--cyan)">.</span></div>
+            <div class="brand-sub">SECURITY CENTER</div>
+        </div>
+    </div>
+
+    <div class="nav-label">MONITORING</div>
+
+    <a class="on" data-p="dash">
+        <span class="nav-icon">▦</span> Dashboard
+    </a>
+
+    <a data-p="alerts">
+        <span class="nav-icon">⚠</span> Alerts
+    </a>
+
+    <a data-p="traffic">
+        <span class="nav-icon">⌁</span> Traffic Monitor
+    </a>
+
+    <div class="nav-label">MANAGEMENT</div>
+
+    <a data-p="reports">
+        <span class="nav-icon">▤</span> Reports
+    </a>
+
+    <a data-p="blocked">
+        <span class="nav-icon">⛔</span> Blocked IPs
+    </a>
+
+    <a data-p="rules">
+        <span class="nav-icon">⚙</span> Detection Rules
+    </a>
+
+    <a data-p="profile">
+        <span class="nav-icon">◎</span> My Profile
+    </a>
+
+    <a data-p="settings">
+        <span class="nav-icon">◈</span> Settings
+    </a>
+
+    <div class="sp"></div>
+
+    <div class="sidebar-bottom">
+        <div class="profile">
+            <div class="avatar">{{ profile.get('full_name', user)[0]|upper }}</div>
+            <div class="profile-meta">
+                <div class="profile-name">{{ profile.get('full_name', user) }}</div>
+                <div class="profile-role">{{ role }}</div>
+                <div class="profile-email">{{ profile.get('email', '') }}</div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('logout') }}" class="logout-form"
+              onsubmit="return confirm('Are you sure you want to sign out?');">
+            <button type="submit" class="logout">
+                <span class="nav-icon">↪</span> Sign out
+            </button>
+        </form>
+    </div>
+
+</aside>
+
+
+<!-- MAIN CONTENT -->
+
+<main>
+
+    <div id="toasts" role="status" aria-live="polite"></div>
+
+    <header>
+
+        <div class="header-title">
+            <h1 id="title">Security Overview</h1>
+            <p>Monitor network activity, threats and intrusion attempts.</p>
+        </div>
+
+        <div class="header-actions">
+            <span class="status">
+                <span class="status-dot"></span>
+                SIMULATION ACTIVE
+            </span>
+
+            <a class="btn alt" href="/export/csv">↓ Export CSV</a>
+            <a class="btn" href="/report" target="_blank">▤ Generate Report</a>
+            <form method="POST" action="{{ url_for('logout') }}" class="header-logout-form"
+                  onsubmit="return confirm('Are you sure you want to sign out?');">
+                <button class="btn danger" type="submit">↪ Logout</button>
+            </form>
+        </div>
+
+    </header>
+
+
+    <!-- DASHBOARD -->
+
+    <section class="pg on" id="dash">
+
+        <div class="grid kpis" id="kpis"></div>
+
+        <div class="grid two">
+
+            <div class="card">
+                <div class="section-head">
+                    <h3>Network Traffic Overview</h3>
+                    <span class="k">LIVE UPDATES</span>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="line"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-head">
+                    <h3>Attack Distribution</h3>
+                    <span class="k">BY TYPE</span>
+                </div>
+                <div class="chart-wrap small">
+                    <canvas id="donut"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card full-card">
+            <h3>Top Attacker IP Addresses</h3>
+            <div class="chart-wrap small">
+                <canvas id="bar"></canvas>
+            </div>
+        </div>
+
+        <div class="card full-card">
+            <div class="section-head">
+                <h3>Recent Security Alerts</h3>
+                <a class="btn alt" data-go="alerts">View all alerts →</a>
+            </div>
+            <div class="table-wrap">
+                <table id="recent"></table>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ALERTS -->
+
+    <section class="pg" id="alerts">
+
+        <div class="card">
+
+            <div class="section-head">
+                <h3>Security Alert History</h3>
+
+                <select id="flt">
+                    <option value="">All severities</option>
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table id="all"></table>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TRAFFIC MONITOR -->
+
+    <section class="pg" id="traffic">
+
+        <div class="card">
+            <div class="section-head">
+                <h3>Live Network Traffic</h3>
+                <span class="k">PACKETS PER UPDATE</span>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="line2"></canvas>
+            </div>
+        </div>
+
+        <div class="card full-card">
+
+            <h3>Attack Simulation Console</h3>
+
+            <p class="description">
+                Administrators can generate controlled simulated attack
+                scenarios to test the detection engine and alert system.
+            </p>
+
+            <div class="header-actions">
+                <button class="btn" data-sim="port_scan">⌕ Port Scan</button>
+                <button class="btn" data-sim="ddos">⚡ DDoS Flood</button>
+                <button class="btn" data-sim="brute_force">🔐 Brute Force</button>
+                <button class="btn" data-sim="sqli">⌘ SQL Injection</button>
+                <button class="btn" data-sim="xss">⚠ XSS Attack</button>
+            </div>
+
+            <p class="k" id="sim-message" style="margin-top:15px"></p>
+
+        </div>
+
+    </section>
+
+
+    <!-- REPORTS -->
+
+    <section class="pg" id="reports">
+
+        <div class="card">
+            <h3>Security Reports</h3>
+
+            <p class="description">
+                Export the recorded intrusion alerts as a CSV spreadsheet
+                or open a printable security report.
+            </p>
+
+            <div class="header-actions">
+                <a class="btn" href="/export/csv">↓ Download CSV</a>
+                <a class="btn alt" href="/report" target="_blank">▤ Open Report</a>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- BLOCKED IPS -->
+
+    <section class="pg" id="blocked">
+
+        <div class="card">
+            <h3>Blocked IP Addresses</h3>
+
+            <p class="description">
+                Sources added to the application's simulated blocklist
+                after qualifying detections.
+            </p>
+
+            <div class="table-wrap">
+                <table id="bl"></table>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- RULES -->
+
+    <section class="pg" id="rules">
+
+        <div class="card">
+            <h3>Intrusion Detection Rules</h3>
+
+            <p class="description">
+                Enable or disable individual detection rules.
+                These controls are available to administrators only.
+            </p>
+
+            <div id="rl"></div>
+        </div>
+
+    </section>
+
+
+
+    <!-- PROFILE -->
+
+    <section class="pg" id="profile">
+        <div class="grid two">
+            <div class="card">
+                <div class="profile-large">
+                    <div class="avatar profile-avatar-large">{{ profile.get('full_name', user)[0]|upper }}</div>
+                    <div>
+                        <h2 style="margin:0 0 6px">{{ profile.get('full_name', user) }}</h2>
+                        <div class="k">{{ profile.get('job_title', 'NIDS User') }}</div>
+                        <span class="b Low" style="margin-top:10px">{{ role|upper }}</span>
+                    </div>
+                </div>
+                <p class="description" style="margin-top:18px">{{ profile.get('description', '') }}</p>
+                <div class="rule"><span class="rule-name">Account type</span><span class="k">{{ profile.get('account_type', role) }}</span></div>
+                <div class="rule"><span class="rule-name">Department</span><span class="k">{{ profile.get('department', '—') }}</span></div>
+                <div class="rule"><span class="rule-name">Team</span><span class="k">{{ profile.get('team', '—') }}</span></div>
+            </div>
+            <div class="card">
+                <h3>Account Information</h3>
+                <div class="rule"><span class="rule-name">Username</span><span class="k">{{ user }}</span></div>
+                <div class="rule"><span class="rule-name">Email</span><span class="k">{{ profile.get('email', '—') }}</span></div>
+                <div class="rule"><span class="rule-name">Phone</span><span class="k">{{ profile.get('phone', '—') }}</span></div>
+                <div class="rule"><span class="rule-name">Location</span><span class="k">{{ profile.get('location', '—') }}</span></div>
+                <div class="rule"><span class="rule-name">Last login</span><span class="k">{{ login_time }}</span></div>
+                <div class="rule"><span class="rule-name">Access level</span><span class="k">{{ 'Full administrative access' if role == 'admin' else 'Read-only monitoring access' }}</span></div>
+            </div>
+        </div>
+        <div class="card full-card">
+            <h3>Permissions</h3>
+            <div class="rule"><span class="rule-name">View dashboard and alerts</span><span class="b Low">Allowed</span></div>
+            <div class="rule"><span class="rule-name">Export reports</span><span class="b Low">Allowed</span></div>
+            <div class="rule"><span class="rule-name">Change detection rules</span><span class="b {{ 'Low' if role == 'admin' else 'Medium' }}">{{ 'Allowed' if role == 'admin' else 'Restricted' }}</span></div>
+            <div class="rule"><span class="rule-name">Run attack simulations</span><span class="b {{ 'Low' if role == 'admin' else 'Medium' }}">{{ 'Allowed' if role == 'admin' else 'Restricted' }}</span></div>
+        </div>
+    </section>
+
+    <!-- SETTINGS -->
+
+    <section class="pg" id="settings">
+        <div class="card">
+            <div class="section-head">
+                <h3>Dashboard Preferences</h3>
+                <span class="k">SAVED TO SQLITE</span>
+            </div>
+            <p class="description">Configure dashboard refresh behaviour and notification preferences for this NIDS installation.</p>
+
+            <div class="rule">
+                <div>
+                    <div class="rule-name">Automatic dashboard refresh</div>
+                    <div class="rule-status">Choose how often the dashboard requests updated statistics.</div>
+                </div>
+                <select id="refresh-setting">
+                    <option value="2000">Every 2 seconds</option>
+                    <option value="5000">Every 5 seconds</option>
+                    <option value="10000">Every 10 seconds</option>
+                </select>
+            </div>
+
+            <div class="rule">
+                <div>
+                    <div class="rule-name">Browser notifications</div>
+                    <div class="rule-status">Show in-dashboard notifications for new high-severity alerts.</div>
+                </div>
+                <input type="checkbox" id="browser-notifications" style="width:18px;height:18px;accent-color:var(--cyan)">
+            </div>
+
+            <div class="rule">
+                <div>
+                    <div class="rule-name">Critical email notifications</div>
+                    <div class="rule-status">Send critical alerts to the configured SMTP receiver.</div>
+                </div>
+                <input type="checkbox" id="email-notifications" style="width:18px;height:18px;accent-color:var(--cyan)">
+            </div>
+
+            <div style="margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <button class="btn" id="save-settings" type="button">Save Preferences</button>
+                <span class="k" id="settings-message"></span>
+            </div>
+        </div>
+
+        <div class="grid two full-card">
+            <div class="card">
+                <h3>Email Notification Status</h3>
+                <p class="description">Critical alerts can be emailed only when SMTP credentials are configured as environment variables before starting Flask.</p>
+                <div class="rule">
+                    <span class="rule-name">SMTP configuration</span>
+                    <b id="es">Checking...</b>
+                </div>
+                <div style="margin-top:18px">
+                    <button class="btn" id="te" type="button">✉ Send Test Email</button>
+                    <span id="tm" class="k" style="margin-left:10px"></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>System Information</h3>
+                <div class="rule"><span class="rule-name">Application</span><span class="k">Network Intrusion Detection System</span></div>
+                <div class="rule"><span class="rule-name">Detection Method</span><span class="k">Rule-based detection</span></div>
+                <div class="rule"><span class="rule-name">Traffic Source</span><span class="k">Software-based simulation</span></div>
+                <div class="rule"><span class="rule-name">Database</span><span class="k">SQLite · nids.db</span></div>
+                <div class="rule"><span class="rule-name">Current User</span><span class="k">{{ user }} ({{ role }})</span></div>
+                <div class="rule"><span class="rule-name">Auto-blocking</span><span class="k">Controlled in Detection Rules</span></div>
+            </div>
+        </div>
+
+        <div class="card full-card">
+            <h3>Security Notes</h3>
+            <p class="description">This version generates software-based simulated traffic. The blocklist records simulated blocking decisions; it does not modify Windows Firewall rules or block real network traffic.</p>
+            <p class="description">Use a unique SECRET_KEY and keep email credentials in environment variables. Do not publish demo credentials in a production deployment.</p>
+        </div>
+    </section>
+
+</main>
+
+
+<script>
+
+/* =====================================================
+   APPLICATION STATE
+===================================================== */
+
+const $ = selector => document.querySelector(selector);
+
+let last = 0;
+let first = true;
+let charts = [];
+let donut;
+let bar;
+let latestData = null;
+let loading = false;
+/* =====================================================
+   HTML ESCAPING
+===================================================== */
+
+function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function navigate(page) {
+
+    if (!document.getElementById(page)) return;
+
+    document.querySelectorAll(".pg").forEach(section => {
+        section.classList.remove("on");
+    });
+
+    document.querySelectorAll("aside a[data-p]").forEach(link => {
+        link.classList.remove("on");
+    });
+
+    document.getElementById(page).classList.add("on");
+
+    const activeLink = document.querySelector(
+        `aside a[data-p="${page}"]`
+    );
+
+    if (activeLink) activeLink.classList.add("on");
+
+    const titles = {
+        dash: "Security Overview",
+        alerts: "Security Alerts",
+        traffic: "Network Traffic Monitor",
+        reports: "Security Reports",
+        blocked: "Blocked IP Addresses",
+        rules: "Detection Rules",
+        settings: "System Settings",
+        profile: "My Profile"
+    };
+
+    $("#title").textContent = titles[page] || "NIDS";
+
+    if (latestData) updateCharts(latestData);
+}
+
+document.querySelectorAll("aside a[data-p]").forEach(link => {
+    link.addEventListener("click", () => {
+        navigate(link.dataset.p);
+    });
+});
+
+document.querySelectorAll("[data-go]").forEach(link => {
+    link.addEventListener("click", () => {
+        navigate(link.dataset.go);
+    });
+});
+
+
+/* =====================================================
+   TOAST NOTIFICATIONS
+===================================================== */
+
+function toast(message, type = "error") {
+
+    const element = document.createElement("div");
+
+    element.className = type === "info"
+        ? "toast info"
+        : "toast";
+
+    element.textContent = message;
+
+    $("#toasts").appendChild(element);
+
+    setTimeout(() => element.remove(), 5000);
+}
+
+
+/* =====================================================
+   CHART CONFIGURATION
+===================================================== */
+
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    plugins: {
+        legend: {
+            position: "bottom",
+            labels: {
+                color: "#a5b4cc",
+                usePointStyle: true,
+                padding: 18,
+                font: { size: 10 }
+            }
+        }
+    },
+    scales: {
+        x: {
+            ticks: { color: "#8391ab", font: { size: 10 } },
+            grid: { color: "rgba(148,163,184,.07)" }
+        },
+        y: {
+            beginAtZero: true,
+            ticks: { color: "#8391ab", font: { size: 10 } },
+            grid: { color: "rgba(148,163,184,.07)" }
+        }
+    }
+};
+
+
+function makeLine(id) {
+
+    return new Chart($(id), {
+        type: "line",
+
+        data: {
+            labels: [],
+
+            datasets: [
+                {
+                    label: "Normal",
+                    data: [],
+                    borderColor: "#36d6c5",
+                    backgroundColor: "rgba(54,214,197,.08)",
+                    fill: true,
+                    tension: .4,
+                    pointRadius: 2
+                },
+                {
+                    label: "Dropped",
+                    data: [],
+                    borderColor: "#ffb45c",
+                    tension: .4,
+                    pointRadius: 2
+                },
+                {
+                    label: "Malicious",
+                    data: [],
+                    borderColor: "#ff647c",
+                    backgroundColor: "rgba(255,100,124,.06)",
+                    fill: true,
+                    tension: .4,
+                    pointRadius: 2
+                }
+            ]
+        },
+
+        options: chartOptions
+    });
+}
+
+
+charts = [
+    makeLine("#line"),
+    makeLine("#line2")
+];
+
+
+donut = new Chart($("#donut"), {
+
+    type: "doughnut",
+
+    data: {
+        labels: [],
+
+        datasets: [{
+            data: [],
+            backgroundColor: [
+                "#9b8cff",
+                "#ff647c",
+                "#36d6c5",
+                "#ffb45c",
+                "#65a5ff"
+            ],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "70%",
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: {
+                    color: "#a5b4cc",
+                    usePointStyle: true,
+                    padding: 15,
+                    font: { size: 10 }
+                }
+            }
+        }
+    }
+
+});
+
+
+bar = new Chart($("#bar"), {
+
+    type: "bar",
+
+    data: {
+        labels: [],
+
+        datasets: [{
+            label: "Alerts",
+            data: [],
+            backgroundColor: [
+                "#36d6c5",
+                "#9b8cff",
+                "#65a5ff",
+                "#ffb45c",
+                "#ff647c"
+            ],
+            borderRadius: 6
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        animation: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: { color: "#8391ab" },
+                grid: { color: "rgba(148,163,184,.07)" }
+            },
+            y: {
+                ticks: { color: "#d6def0" },
+                grid: { display: false }
+            }
+        }
+    }
+
+});
+
+
+/* =====================================================
+   TABLE GENERATION
+===================================================== */
+
+function rows(alerts) {
+
+    const heading = `
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Attack Type</th>
+                <th>Source IP</th>
+                <th>Destination IP</th>
+                <th>Severity</th>
+                <th>Action</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+    `;
+
+    if (!alerts || alerts.length === 0) {
+
+        return heading + `
+            <tbody>
+                <tr>
+                    <td colspan="7" class="empty">
+                        No security alerts recorded yet.
+                    </td>
+                </tr>
+            </tbody>
+        `;
+    }
+
+    return heading + `
+        <tbody>
+            ${alerts.map(alert => `
+                <tr>
+                    <td>${esc(alert.time)}</td>
+                    <td>${esc(alert.type)}</td>
+                    <td>${esc(alert.src)}</td>
+                    <td>${esc(alert.dst)}</td>
+                    <td>
+                        <span class="b ${esc(alert.severity)}">
+                            ${esc(alert.severity)}
+                        </span>
+                    </td>
+                    <td>${esc(alert.action)}</td>
+                    <td>${esc(alert.detail)}</td>
+                </tr>
+            `).join("")}
+        </tbody>
+    `;
+}
+
+
+/* =====================================================
+   KPI CARDS
+===================================================== */
+
+function updateKPIs(kpi) {
+
+    const items = [
+
+        {
+            label: "Total Alerts",
+            value: kpi.total,
+            icon: "⚠",
+            color: "#9b8cff",
+            bg: "rgba(155,140,255,.13)",
+            caption: "Recorded security events"
+        },
+
+        {
+            label: "Critical Alerts",
+            value: kpi.critical,
+            icon: "✦",
+            color: "#ff647c",
+            bg: "rgba(255,100,124,.13)",
+            caption: "Highest severity threats"
+        },
+
+        {
+            label: "Blocked Attacks",
+            value: kpi.blocked,
+            icon: "⛔",
+            color: "#ffb45c",
+            bg: "rgba(255,180,92,.13)",
+            caption: "Simulated block actions"
+        },
+
+        {
+            label: "Packets Analyzed",
+            value: Number(kpi.packets).toLocaleString(),
+            icon: "⌁",
+            color: "#36d6c5",
+            bg: "rgba(54,214,197,.13)",
+            caption: "Simulated packets processed"
+        },
+
+        {
+            label: "Active Connections",
+            value: kpi.conns,
+            icon: "◎",
+            color: "#65a5ff",
+            bg: "rgba(101,165,255,.13)",
+            caption: "Estimated connections"
+        }
+
+    ];
+
+    $("#kpis").innerHTML = items.map(item => `
+
+        <div class="card kpi" style="--glow:${item.color}">
+
+            <div class="kpi-top">
+                <div class="k">${item.label}</div>
+
+                <div class="kpi-icon"
+                     style="--iconbg:${item.bg};color:${item.color}">
+                    ${item.icon}
+                </div>
+            </div>
+
+            <div class="v">${item.value}</div>
+
+            <div class="kpi-caption">${item.caption}</div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================================
+   CHART UPDATES
+===================================================== */
+
+function updateCharts(data) {
+
+    charts.forEach(chart => {
+
+        chart.data.labels = data.traffic.map(item => item.t);
+
+        ["normal", "dropped", "malicious"].forEach(
+            (key, index) => {
+
+                chart.data.datasets[index].data =
+                    data.traffic.map(item => item[key]);
+
+            }
+        );
+
+        chart.update("none");
+
+    });
+
+    donut.data.labels = Object.keys(data.types);
+
+    donut.data.datasets[0].data =
+        Object.values(data.types);
+
+    donut.update("none");
+
+    bar.data.labels = data.top.map(item => item.ip);
+
+    bar.data.datasets[0].data =
+        data.top.map(item => item.c);
+
+    bar.update("none");
+
+}
+
+
+/* =====================================================
+   BLOCKED IP TABLE
+===================================================== */
+
+function updateBlocked(data) {
+
+    const admin = data.role === "admin";
+
+    const heading = `
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Reason</th>
+                <th>Blocked At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    `;
+
+    if (!data.blocked.length) {
+
+        $("#bl").innerHTML = heading + `
+            <tbody>
+                <tr>
+                    <td colspan="4" class="empty">
+                        No blocked IP addresses found.
+                    </td>
+                </tr>
+            </tbody>
+        `;
+
+        return;
+    }
+
+    $("#bl").innerHTML = heading + `
+        <tbody>
+            ${data.blocked.map(item => `
+
+                <tr>
+                    <td>${esc(item.ip)}</td>
+                    <td>${esc(item.reason)}</td>
+                    <td>${esc(item.time)}</td>
+
+                    <td>
+                        <button
+                            class="btn alt"
+                            data-unblock="${esc(item.ip)}"
+                            ${admin ? "" : "disabled"}>
+                            Unblock
+                        </button>
+                    </td>
+                </tr>
+
+            `).join("")}
+        </tbody>
+    `;
+
+}
+
+
+/* =====================================================
+   DETECTION RULES
+===================================================== */
+
+function updateRules(data) {
+
+    const admin = data.role === "admin";
+
+    const entries = Object.entries(data.rules);
+
+    $("#rl").innerHTML = entries.map(([name, enabled]) => `
+
+        <div class="rule">
+
+            <div>
+                <div class="rule-name">${esc(name)}</div>
+                <div class="rule-status">
+                    ${enabled ? "Detection enabled" : "Detection disabled"}
+                </div>
+            </div>
+
+            <button
+                class="btn ${enabled ? "" : "alt"}"
+                data-rule="${esc(name)}"
+                ${admin ? "" : "disabled"}>
+
+                ${enabled ? "Enabled" : "Disabled"}
+
+            </button>
+
+        </div>
+
+    `).join("") + `
+
+        <div class="rule">
+
+            <div>
+                <div class="rule-name">
+                    Automatic Blocking
+                </div>
+
+                <div class="rule-status">
+                    Automatically block Critical and High severity sources
+                </div>
+            </div>
+
+            <button
+                class="btn ${data.autoblock ? "" : "alt"}"
+                id="autoblock-btn"
+                ${admin ? "" : "disabled"}>
+
+                ${data.autoblock ? "On" : "Off"}
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   MAIN DATA REFRESH
+===================================================== */
+
+async function tick() {
+
+    if (loading) return;
+
+    loading = true;
+
+    try {
+
+        const response = await fetch("/api/data", {
+            cache: "no-store"
+        });
+
+        if (response.redirected) {
+
+            window.location.href = "/login";
+            return;
+
+        }
+
+        if (!response.ok) {
+
+            if (response.status === 401 || response.status === 403) {
+                toast("Your session may have expired. Please sign in again.");
+            } else {
+                toast("Unable to retrieve dashboard data.");
+            }
+
+            return;
+        }
+
+        const data = await response.json();
+
+        latestData = data;
+
+        updateKPIs(data.kpi);
+
+        updateCharts(data);
+
+        $("#recent").innerHTML = rows(
+            data.alerts.slice(0, 6)
+        );
+
+        const filter = $("#flt").value;
+
+        $("#all").innerHTML = rows(
+            data.alerts.filter(alert =>
+                !filter || alert.severity === filter
+            )
+        );
+
+        updateBlocked(data);
+
+        updateRules(data);
+
+        $("#es").textContent = data.email
+            ? "Configured"
+            : "Not configured";
+
+        $("#refresh-setting").value = String(data.settings.refresh_interval);
+        $("#browser-notifications").checked = data.settings.browser_notifications;
+        $("#email-notifications").checked = data.settings.email_notifications;
+
+        const preferredInterval = data.settings.refresh_interval;
+        if (window.nidsRefreshInterval !== preferredInterval) {
+            window.nidsRefreshInterval = preferredInterval;
+            if (window.nidsRefreshTimer) clearInterval(window.nidsRefreshTimer);
+            window.nidsRefreshTimer = setInterval(tick, preferredInterval);
+        }
+
+        $("#es").style.color = data.email
+            ? "var(--green)"
+            : "var(--orange)";
+
+        // Notify about newly recorded high-severity alerts.
+
+        (data.settings.browser_notifications ? data.alerts : [])
+            .filter(alert =>
+                Number(alert.id) > last &&
+                (
+                    alert.severity === "Critical" ||
+                    alert.severity === "High"
+                )
+            )
+            .slice(0, 5)
+            .forEach(alert => {
+
+                if (!first) {
+
+                    toast(
+                        `${alert.severity}: ${alert.type} from ${alert.src}`
+                    );
+
+                }
+
+            });
+
+        if (data.alerts.length) {
+
+            last = Math.max(
+                last,
+                ...data.alerts.map(alert => Number(alert.id) || 0)
+            );
+
+        }
+
+        first = false;
+
+    } catch (error) {
+
+        console.error("Dashboard refresh error:", error);
+
+        if (!first) {
+            toast("Dashboard connection error. Retrying...");
+        }
+
+    } finally {
+
+        loading = false;
+
+    }
+
+}
+
+
+/* =====================================================
+   BUTTON ACTIONS
+===================================================== */
+
+async function apiPost(url) {
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        if (response.redirected) {
+            window.location.href = "/login";
+            return null;
+        }
+
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+
+            toast(result.message || "Action failed.");
+            return null;
+
+        }
+
+        toast(result.message || "Action completed.", "info");
+
+        await tick();
+
+        return result;
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast("Could not complete the requested action.");
+
+        return null;
+
+    }
+
+}
+
+
+/* =====================================================
+   ATTACK SIMULATION
+===================================================== */
+
+document.querySelectorAll("[data-sim]").forEach(button => {
+
+    button.addEventListener("click", async () => {
+
+        const kind = button.dataset.sim;
+
+        const result = await apiPost(
+            `/api/simulate/${encodeURIComponent(kind)}`
+        );
+
+        if (result) {
+
+            $("#sim-message").textContent =
+                result.message || "Simulation queued.";
+
+        }
+
+    });
+
+});
+
+
+/* =====================================================
+   UNBLOCK IP
+===================================================== */
+
+document.addEventListener("click", event => {
+
+    const button = event.target.closest("[data-unblock]");
+
+    if (!button) return;
+
+    const ip = button.dataset.unblock;
+
+    if (confirm(`Unblock ${ip}?`)) {
+
+        apiPost(
+            `/api/unblock/${encodeURIComponent(ip)}`
+        );
+
+    }
+
+});
+
+
+/* =====================================================
+   RULE TOGGLE
+===================================================== */
+
+document.addEventListener("click", event => {
+
+    const button = event.target.closest("[data-rule]");
+
+    if (!button) return;
+
+    const rule = button.dataset.rule;
+
+    apiPost(
+        `/api/rules/${encodeURIComponent(rule)}`
+    );
+
+});
+
+
+/* =====================================================
+   AUTOBLOCK TOGGLE
+===================================================== */
+
+document.addEventListener("click", event => {
+
+    if (event.target.id === "autoblock-btn") {
+
+        apiPost("/api/autoblock");
+
+    }
+
+});
+
+
+/* =====================================================
+   ALERT FILTER
+===================================================== */
+
+$("#flt").addEventListener("change", () => {
+
+    if (!latestData) return;
+
+    const filter = $("#flt").value;
+
+    $("#all").innerHTML = rows(
+        latestData.alerts.filter(alert =>
+            !filter || alert.severity === filter
+        )
+    );
+
+});
+
+
+/* =====================================================
+   SAVE SETTINGS
+===================================================== */
+
+$("#save-settings").addEventListener("click", async () => {
+    const button = $("#save-settings");
+    button.disabled = true;
+    $("#settings-message").textContent = "Saving...";
+
+    try {
+        const response = await fetch("/api/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                refresh_interval: Number($("#refresh-setting").value),
+                browser_notifications: $("#browser-notifications").checked,
+                email_notifications: $("#email-notifications").checked
+            })
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+            throw new Error(result.message || "Could not save settings.");
+        }
+
+        $("#settings-message").textContent = result.message;
+        toast(result.message, "info");
+        await tick();
+    } catch (error) {
+        $("#settings-message").textContent = error.message;
+        toast(error.message);
+    } finally {
+        button.disabled = false;
+    }
+});
+
+
+/* =====================================================
+   TEST EMAIL
+===================================================== */
+
+$("#te").addEventListener("click", async () => {
+
+    const button = $("#te");
+
+    button.disabled = true;
+
+    $("#tm").textContent = "Sending...";
+
+    try {
+
+        const response = await fetch(
+            "/api/test-email",
+            { method: "POST" }
+        );
+
+        const result = await response.json();
+
+        $("#tm").textContent = result.message;
+
+        if (!response.ok || !result.ok) {
+            toast(result.message || "Email test failed.");
+        } else {
+            toast("Test email completed.", "info");
+        }
+
+    } catch (error) {
+
+        $("#tm").textContent = "Email request failed.";
+
+        toast("Unable to send test email.");
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+});
+
+
+/* =====================================================
+   START APPLICATION
+===================================================== */
+
+tick();
+
+window.nidsRefreshInterval = 2000;
+window.nidsRefreshTimer = setInterval(tick, window.nidsRefreshInterval);
+
+</script>
+
+</body>
+</html>

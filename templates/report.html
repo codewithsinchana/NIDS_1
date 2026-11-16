@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><title>NIDS Report</title><style>
+body{font-family:Arial,sans-serif;margin:32px;color:#111}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border:1px solid #bbb;padding:6px 8px;text-align:left}th{background:#eef}@media print{button{display:none}}</style></head><body>
+<h1>NIDS Alert Report</h1><p>Generated {{ now }} · Total alerts: {{ stats.get('total',0) }} · Blocked: {{ stats.get('blocked',0) }} · Critical: {{ stats.get('Critical',0) }}</p>
+<button onclick="print()">Print / Save as PDF</button>
+<table><tr><th>Time</th><th>Type</th><th>Source</th><th>Destination</th><th>Severity</th><th>Action</th><th>Detail</th></tr>
+{% for a in alerts %}<tr><td>{{a.time}}</td><td>{{a.type}}</td><td>{{a.src}}</td><td>{{a.dst}}</td><td>{{a.severity}}</td><td>{{a.action}}</td><td>{{a.detail}}</td></tr>{% endfor %}</table></body></html>
