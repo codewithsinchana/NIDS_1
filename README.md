@@ -12,7 +12,7 @@ The current implementation uses simulated network traffic to demonstrate detecti
 
 ## Features
 
-- **Security Dashboard:** Displays security statistics, attack distribution, traffic trends, and recent alerts.
+- **Security Dashboard:** Displays security statistics, attack distribution, traffic trends , and recent alerts.
 - **Intrusion Detection:** Demonstrates detection of common attack patterns.
 - **Attack Simulation:** Supports simulated Port Scanning, DDoS, Brute Force, SQL Injection, and XSS scenarios.
 - **Alert Management:** Displays detected events with severity levels such as Critical, High, Medium, and Low.
