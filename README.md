@@ -171,7 +171,7 @@ The application provides simulated attack scenarios to demonstrate the detection
 
 **Sinchana T R**
 
-Computer Science and Engineering (Cyber Security)
+Computer Science and Engineering - (Cyber Security)
 
 GitHub: https://github.com/codewithsinchana
 
