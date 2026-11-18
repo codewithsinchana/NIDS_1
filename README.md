@@ -172,7 +172,7 @@ The application provides simulated attack scenarios to demonstrate the detection
 **Sinchana T R**
 
 Computer Science and Engineering - (Cyber Security)
-Dayananda 
+Dayananda Sagar College
 
 GitHub: https://github.com/codewithsinchana
 
